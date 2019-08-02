@@ -117,7 +117,7 @@
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
         <!--Checks that there are no import statements that use the * notation-->
-        <module name="AvoidStarImport"/>
+<!--        <module name="AvoidStarImport"/>-->
 
         <!--whitespace-->
         <module name="GenericWhitespace"/>
@@ -127,7 +127,7 @@
             <property name="allowEmptyConstructors" value="true"/>
             <property name="allowEmptyMethods" value="true"/>
         </module>
-        <module name="Indentation"/>
+<!--        <module name="Indentation"/>-->
         <module name="MethodParamPad"/>
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>

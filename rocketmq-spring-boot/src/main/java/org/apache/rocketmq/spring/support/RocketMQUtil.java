@@ -16,7 +16,7 @@
  */
 package org.apache.rocketmq.spring.support;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -80,19 +80,19 @@ public class RocketMQUtil {
     }
 
     public static org.springframework.messaging.Message convertToSpringMessage(
-        org.apache.rocketmq.common.message.MessageExt message) {
+            org.apache.rocketmq.common.message.MessageExt message) {
         MessageBuilder messageBuilder =
-            MessageBuilder.withPayload(message.getBody()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.KEYS), message.getKeys()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TAGS), message.getTags()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TOPIC), message.getTopic()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.MESSAGE_ID), message.getMsgId()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.BORN_TIMESTAMP), message.getBornTimestamp()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.BORN_HOST), message.getBornHostString()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.FLAG), message.getFlag()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.QUEUE_ID), message.getQueueId()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.SYS_FLAG), message.getSysFlag()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TRANSACTION_ID), message.getTransactionId());
+                MessageBuilder.withPayload(message.getBody()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.KEYS), message.getKeys()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TAGS), message.getTags()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TOPIC), message.getTopic()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.MESSAGE_ID), message.getMsgId()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.BORN_TIMESTAMP), message.getBornTimestamp()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.BORN_HOST), message.getBornHostString()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.FLAG), message.getFlag()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.QUEUE_ID), message.getQueueId()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.SYS_FLAG), message.getSysFlag()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TRANSACTION_ID), message.getTransactionId());
         addUserProperties(message.getProperties(), messageBuilder);
         return messageBuilder.build();
     }
@@ -114,21 +114,21 @@ public class RocketMQUtil {
     }
 
     public static org.springframework.messaging.Message convertToSpringMessage(
-        org.apache.rocketmq.common.message.Message message) {
+            org.apache.rocketmq.common.message.Message message) {
         MessageBuilder messageBuilder =
-            MessageBuilder.withPayload(message.getBody()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.KEYS), message.getKeys()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TAGS), message.getTags()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TOPIC), message.getTopic()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.FLAG), message.getFlag()).
-                setHeader(toRocketHeaderKey(RocketMQHeaders.TRANSACTION_ID), message.getTransactionId());
+                MessageBuilder.withPayload(message.getBody()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.KEYS), message.getKeys()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TAGS), message.getTags()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TOPIC), message.getTopic()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.FLAG), message.getFlag()).
+                        setHeader(toRocketHeaderKey(RocketMQHeaders.TRANSACTION_ID), message.getTransactionId());
         addUserProperties(message.getProperties(), messageBuilder);
         return messageBuilder.build();
     }
 
     public static org.apache.rocketmq.common.message.Message convertToRocketMessage(
-        ObjectMapper objectMapper, String charset,
-        String destination, org.springframework.messaging.Message<?> message) {
+            String charset,
+            String destination, org.springframework.messaging.Message<?> message) {
         Object payloadObj = message.getPayload();
         byte[] payloads;
 
@@ -138,7 +138,7 @@ public class RocketMQUtil {
             payloads = (byte[]) message.getPayload();
         } else {
             try {
-                String jsonObj = objectMapper.writeValueAsString(payloadObj);
+                String jsonObj = JSON.toJSONString(payloadObj);
                 payloads = jsonObj.getBytes(Charset.forName(charset));
             } catch (Exception e) {
                 throw new RuntimeException("convert to RocketMQ message failed.", e);
@@ -176,13 +176,13 @@ public class RocketMQUtil {
             rocketMsg.setWaitStoreMsgOK(waitStoreMsgOK);
 
             headers.entrySet().stream()
-                .filter(entry -> !Objects.equals(entry.getKey(), "FLAG")
-                    && !Objects.equals(entry.getKey(), "WAIT_STORE_MSG_OK")) // exclude "FLAG", "WAIT_STORE_MSG_OK"
-                .forEach(entry -> {
-                    if (!MessageConst.STRING_HASH_SET.contains(entry.getKey())) {
-                        rocketMsg.putUserProperty(entry.getKey(), String.valueOf(entry.getValue()));
-                    }
-                });
+                    .filter(entry -> !Objects.equals(entry.getKey(), "FLAG")
+                            && !Objects.equals(entry.getKey(), "WAIT_STORE_MSG_OK")) // exclude "FLAG", "WAIT_STORE_MSG_OK"
+                    .forEach(entry -> {
+                        if (!MessageConst.STRING_HASH_SET.contains(entry.getKey())) {
+                            rocketMsg.putUserProperty(entry.getKey(), String.valueOf(entry.getValue()));
+                        }
+                    });
 
         }
 
@@ -210,8 +210,8 @@ public class RocketMQUtil {
         StringBuilder instanceName = new StringBuilder();
         SessionCredentials sessionCredentials = ((AclClientRPCHook) rpcHook).getSessionCredentials();
         instanceName.append(sessionCredentials.getAccessKey())
-            .append(separator).append(sessionCredentials.getSecretKey())
-            .append(separator).append(identify);
+                .append(separator).append(sessionCredentials.getSecretKey())
+                .append(separator).append(identify);
         return instanceName.toString();
     }
 }

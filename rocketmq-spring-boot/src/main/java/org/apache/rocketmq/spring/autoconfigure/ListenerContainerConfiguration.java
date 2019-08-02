@@ -17,7 +17,6 @@
 
 package org.apache.rocketmq.spring.autoconfigure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.rocketmq.client.AccessChannel;
 import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.MessageModel;
@@ -56,12 +55,9 @@ public class ListenerContainerConfiguration implements ApplicationContextAware, 
 
     private RocketMQProperties rocketMQProperties;
 
-    private ObjectMapper objectMapper;
-
-    public ListenerContainerConfiguration(ObjectMapper rocketMQMessageObjectMapper,
-        StandardEnvironment environment,
-        RocketMQProperties rocketMQProperties) {
-        this.objectMapper = rocketMQMessageObjectMapper;
+    public ListenerContainerConfiguration(
+            StandardEnvironment environment,
+            RocketMQProperties rocketMQProperties) {
         this.environment = environment;
         this.rocketMQProperties = rocketMQProperties;
     }
@@ -93,25 +89,25 @@ public class ListenerContainerConfiguration implements ApplicationContextAware, 
         String topic = this.environment.resolvePlaceholders(annotation.topic());
 
         boolean listenerEnabled =
-            (boolean)rocketMQProperties.getConsumer().getListeners().getOrDefault(consumerGroup, Collections.EMPTY_MAP)
-                .getOrDefault(topic, true);
+                (boolean) rocketMQProperties.getConsumer().getListeners().getOrDefault(consumerGroup, Collections.EMPTY_MAP)
+                        .getOrDefault(topic, true);
 
         if (!listenerEnabled) {
             log.debug(
-                "Consumer Listener (group:{},topic:{}) is not enabled by configuration, will ignore initialization.",
-                consumerGroup, topic);
+                    "Consumer Listener (group:{},topic:{}) is not enabled by configuration, will ignore initialization.",
+                    consumerGroup, topic);
             return;
         }
         validate(annotation);
 
         String containerBeanName = String.format("%s_%s", DefaultRocketMQListenerContainer.class.getName(),
-            counter.incrementAndGet());
+                counter.incrementAndGet());
         GenericApplicationContext genericApplicationContext = (GenericApplicationContext) applicationContext;
 
         genericApplicationContext.registerBean(containerBeanName, DefaultRocketMQListenerContainer.class,
-            () -> createRocketMQListenerContainer(containerBeanName, bean, annotation));
+                () -> createRocketMQListenerContainer(containerBeanName, bean, annotation));
         DefaultRocketMQListenerContainer container = genericApplicationContext.getBean(containerBeanName,
-            DefaultRocketMQListenerContainer.class);
+                DefaultRocketMQListenerContainer.class);
         if (!container.isRunning()) {
             try {
                 container.start();
@@ -138,7 +134,6 @@ public class ListenerContainerConfiguration implements ApplicationContextAware, 
         container.setConsumerGroup(environment.resolvePlaceholders(annotation.consumerGroup()));
         container.setRocketMQMessageListener(annotation);
         container.setRocketMQListener((RocketMQListener) bean);
-        container.setObjectMapper(objectMapper);
         container.setName(name);  // REVIEW ME, use the same clientId or multiple?
 
         return container;
@@ -146,9 +141,9 @@ public class ListenerContainerConfiguration implements ApplicationContextAware, 
 
     private void validate(RocketMQMessageListener annotation) {
         if (annotation.consumeMode() == ConsumeMode.ORDERLY &&
-            annotation.messageModel() == MessageModel.BROADCASTING) {
+                annotation.messageModel() == MessageModel.BROADCASTING) {
             throw new BeanDefinitionValidationException(
-                "Bad annotation definition in @RocketMQMessageListener, messageModel BROADCASTING does not support ORDERLY message!");
+                    "Bad annotation definition in @RocketMQMessageListener, messageModel BROADCASTING does not support ORDERLY message!");
         }
     }
 }

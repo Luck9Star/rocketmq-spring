@@ -16,7 +16,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -24,7 +25,7 @@
         <artifactId>apache</artifactId>
         <version>18</version>
     </parent>
-    
+
     <groupId>org.apache.rocketmq</groupId>
     <artifactId>rocketmq-spring-all</artifactId>
     <version>2.0.4-SNAPSHOT</version>
@@ -33,7 +34,9 @@
     <name>Apache RocketMQ Spring Boot ${project.version}</name>
     <description>Build for Apache RocketMQ Spring Boot Support</description>
     <url>https://github.com/apache/rocketmq-spring</url>
-
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
 
     <scm>
         <url>git@github.com:apache/rocketmq-spring.git</url>
@@ -83,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>validate</id>
@@ -139,8 +142,8 @@
                         </goals>
                     </execution>
                 </executions>
-           </plugin>
-           <plugin>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
@@ -162,7 +165,7 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.0.2</version>
             </plugin>
-           <plugin>
+            <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>0.12</version>
@@ -190,7 +193,7 @@
                 <version>4.3.0</version>
             </plugin>
         </plugins>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -219,4 +222,16 @@
                 <module>rocketmq-spring-boot-samples</module>
         -->
     </modules>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Develop Repository</name>
+            <url>http://maven.videobase.cn/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <name>Dev Release Repo</name>
+            <url>http://maven.videobase.cn/nexus/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
 </project>

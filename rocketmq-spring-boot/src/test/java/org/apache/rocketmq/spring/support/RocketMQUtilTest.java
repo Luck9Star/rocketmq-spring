@@ -16,7 +16,6 @@
  */
 package org.apache.rocketmq.spring.support;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -27,14 +26,12 @@ import static org.junit.Assert.*;
 
 public class RocketMQUtilTest {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     @Test
     public void testMessageBuilder() {
         Message msg = MessageBuilder.withPayload("test").
-            setHeader("A", "test1").
-            setHeader("B", "test2").
-            build();
+                setHeader("A", "test1").
+                setHeader("B", "test2").
+                build();
         System.out.printf("header size=%d  %s %n", msg.getHeaders().size(), msg.getHeaders().toString());
         assertTrue(msg.getHeaders().get("A") != null);
         assertTrue(msg.getHeaders().get("B") != null);
@@ -45,26 +42,26 @@ public class RocketMQUtilTest {
         String charset = "UTF-8";
         String destination = "test-topic";
         Message msgWithStringPayload = MessageBuilder.withPayload("test").build();
-        org.apache.rocketmq.common.message.Message rocketMsg1 = RocketMQUtil.convertToRocketMessage(objectMapper,
-            charset, destination, msgWithStringPayload);
+        org.apache.rocketmq.common.message.Message rocketMsg1 = RocketMQUtil.convertToRocketMessage(
+                charset, destination, msgWithStringPayload);
 
         Message msgWithBytePayload = MessageBuilder.withPayload("test".getBytes()).build();
-        org.apache.rocketmq.common.message.Message rocketMsg2 = RocketMQUtil.convertToRocketMessage(objectMapper,
-            charset, destination, msgWithBytePayload);
+        org.apache.rocketmq.common.message.Message rocketMsg2 = RocketMQUtil.convertToRocketMessage(
+                charset, destination, msgWithBytePayload);
 
-        assertTrue(Arrays.equals(((String)msgWithStringPayload.getPayload()).getBytes(), rocketMsg1.getBody()));
-        assertTrue(Arrays.equals((byte[])msgWithBytePayload.getPayload(), rocketMsg2.getBody()));
+        assertTrue(Arrays.equals(((String) msgWithStringPayload.getPayload()).getBytes(), rocketMsg1.getBody()));
+        assertTrue(Arrays.equals((byte[]) msgWithBytePayload.getPayload(), rocketMsg2.getBody()));
     }
 
     @Test
     public void testHeaderConvertToRMQMsg() {
         Message msgWithStringPayload = MessageBuilder.withPayload("test body")
-            .setHeader("test", 1)
-            .setHeader(RocketMQHeaders.TAGS, "tags")
-            .setHeader(RocketMQHeaders.KEYS, "my_keys")
-            .build();
-        org.apache.rocketmq.common.message.Message rocketMsg = RocketMQUtil.convertToRocketMessage(objectMapper,
-            "UTF-8", "test-topic", msgWithStringPayload);
+                .setHeader("test", 1)
+                .setHeader(RocketMQHeaders.TAGS, "tags")
+                .setHeader(RocketMQHeaders.KEYS, "my_keys")
+                .build();
+        org.apache.rocketmq.common.message.Message rocketMsg = RocketMQUtil.convertToRocketMessage(
+                "UTF-8", "test-topic", msgWithStringPayload);
         assertEquals(String.valueOf("1"), rocketMsg.getProperty("test"));
         assertNull(rocketMsg.getProperty(RocketMQHeaders.TAGS));
         assertEquals("my_keys", rocketMsg.getProperty(RocketMQHeaders.KEYS));
@@ -81,8 +78,8 @@ public class RocketMQUtilTest {
         assertEquals(String.valueOf("1"), springMsg.getHeaders().get("test"));
         assertEquals("tags", springMsg.getHeaders().get(RocketMQHeaders.PREFIX + RocketMQHeaders.TAGS));
 
-        org.apache.rocketmq.common.message.Message rocketMsg = RocketMQUtil.convertToRocketMessage(objectMapper,
-            "UTF-8", "test-topic", springMsg);
+        org.apache.rocketmq.common.message.Message rocketMsg = RocketMQUtil.convertToRocketMessage(
+                "UTF-8", "test-topic", springMsg);
         assertEquals(String.valueOf("1"), rocketMsg.getProperty("test"));
         assertEquals(String.valueOf("tags"), rocketMsg.getProperty(RocketMQHeaders.PREFIX + RocketMQHeaders.TAGS));
         assertNull(rocketMsg.getTags());
