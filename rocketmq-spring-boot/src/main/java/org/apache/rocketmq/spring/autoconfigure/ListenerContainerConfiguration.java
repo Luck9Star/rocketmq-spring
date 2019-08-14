@@ -17,6 +17,7 @@
 
 package org.apache.rocketmq.spring.autoconfigure;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.rocketmq.client.AccessChannel;
 import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.MessageModel;
@@ -135,6 +136,9 @@ public class ListenerContainerConfiguration implements ApplicationContextAware, 
         container.setRocketMQMessageListener(annotation);
         container.setRocketMQListener((RocketMQListener) bean);
         container.setName(name);  // REVIEW ME, use the same clientId or multiple?
+        container.setSelectorExpression(environment.resolvePlaceholders(annotation.selectorExpression()));
+        container.setConsumeThreadMax(NumberUtils.toInt(environment.resolvePlaceholders(annotation.consumeThreadMax()), 64));
+        container.setConsumeTimeout(NumberUtils.toLong(environment.resolvePlaceholders(annotation.consumeTimeout()), 30000L));
 
         return container;
     }

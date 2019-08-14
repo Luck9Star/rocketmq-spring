@@ -73,12 +73,12 @@ public @interface RocketMQMessageListener {
     /**
      * Max consumer thread number.
      */
-    int consumeThreadMax() default 64;
+    String consumeThreadMax() default "64";
 
     /**
      * Max consumer timeout, default 30s.
      */
-    long consumeTimeout() default 30000L;
+    String consumeTimeout() default "30000";
 
     /**
      * The property of "access-key".

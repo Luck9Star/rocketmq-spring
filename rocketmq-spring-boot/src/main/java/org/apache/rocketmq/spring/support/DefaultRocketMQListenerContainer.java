@@ -18,6 +18,7 @@
 package org.apache.rocketmq.spring.support;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.rocketmq.client.AccessChannel;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.MessageSelector;
@@ -173,11 +174,11 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
         this.rocketMQMessageListener = anno;
 
         this.consumeMode = anno.consumeMode();
-        this.consumeThreadMax = anno.consumeThreadMax();
+        this.consumeThreadMax = NumberUtils.toInt(anno.consumeThreadMax(), 64);
         this.messageModel = anno.messageModel();
         this.selectorExpression = anno.selectorExpression();
         this.selectorType = anno.selectorType();
-        this.consumeTimeout = anno.consumeTimeout();
+        this.consumeTimeout = NumberUtils.toLong(anno.consumeTimeout(), 30000L);
     }
 
     public ConsumeMode getConsumeMode() {
@@ -198,6 +199,18 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
 
     public DefaultMQPushConsumer getConsumer() {
         return consumer;
+    }
+
+    public void setConsumeThreadMax(int consumeThreadMax) {
+        this.consumeThreadMax = consumeThreadMax;
+    }
+
+    public void setSelectorExpression(String selectorExpression) {
+        this.selectorExpression = selectorExpression;
+    }
+
+    public void setConsumeTimeout(long consumeTimeout) {
+        this.consumeTimeout = consumeTimeout;
     }
 
     public void setConsumer(DefaultMQPushConsumer consumer) {
@@ -295,6 +308,8 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                 ", selectorType=" + selectorType +
                 ", selectorExpression='" + selectorExpression + '\'' +
                 ", messageModel=" + messageModel +
+                ", consumeThreadMax=" + consumeThreadMax +
+                ", consumeTimeout=" + consumeTimeout +
                 '}';
     }
 
