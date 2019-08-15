@@ -504,7 +504,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @param message     {@link org.springframework.messaging.Message}
      * @param delayLevel   level for the delay message
      */
-    public void sendOneWay(String destination, Message<?> message , int delayLevel) {
+    public void sendOneWay(String destination, Message<?> message, int delayLevel) {
         if (Objects.isNull(message) || Objects.isNull(message.getPayload())) {
             log.error("sendOneWay failed. destination:{}, message is null ", destination);
             throw new IllegalArgumentException("`message` and `message.payload` cannot be null");
