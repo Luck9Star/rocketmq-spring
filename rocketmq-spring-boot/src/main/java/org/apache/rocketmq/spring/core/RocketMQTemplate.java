@@ -550,7 +550,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @param payload     the Object to use as payload
      */
     public void sendOneWay(String destination, Object payload) {
-        sendOneWay(destination, payload);
+        sendOneWay(destination, payload, 0);
     }
 
     /**
