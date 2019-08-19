@@ -97,17 +97,19 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
     public SendResult syncSend(String destination, Message<?> message) {
         return syncSend(destination, message, producer.getSendMsgTimeout());
     }
+
     /**
      * Same to {@link #syncSend(String, Message)} with send timeout specified in addition.
      *
      * @param destination formats: `topicName:tags`
      * @param message     {@link org.springframework.messaging.Message}
-     * @param delayLevel    level for the delay message
+     * @param delayLevel  level for the delay message
      * @return {@link SendResult}
      */
     public SendResult syncSend(String destination, Message<?> message, int delayLevel) {
         return syncSend(destination, message, producer.getSendMsgTimeout(), delayLevel);
     }
+
     /**
      * Same to {@link #syncSend(String, Message)} with send timeout specified in addition.
      *
@@ -126,9 +128,10 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @param destination formats: `topicName:tags`
      * @param messages    Collection of {@link org.springframework.messaging.Message}
      * @param timeout     send timeout with millis
+     * @param delayLevel  level for the delay message
      * @return {@link SendResult}
      */
-    public SendResult syncSend(String destination, Collection<Message<?>> messages, long timeout) {
+    public SendResult syncSend(String destination, Collection<Message<?>> messages, long timeout, int delayLevel) {
         if (Objects.isNull(messages) || messages.size() == 0) {
             log.error("syncSend with batch failed. destination:{}, messages is empty ", destination);
             throw new IllegalArgumentException("`messages` can not be empty");
@@ -144,6 +147,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
                     continue;
                 }
                 rocketMsg = RocketMQUtil.convertToRocketMessage(charset, destination, msg);
+                rocketMsg.setDelayTimeLevel(delayLevel);
                 rmqMsgs.add(rocketMsg);
             }
 
@@ -155,6 +159,41 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
             log.error("syncSend with batch failed. destination:{}, messages.size:{} ", destination, messages.size());
             throw new MessagingException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Same to {@link #syncSend(String, Collection, long, int)} with send timeout specified in addition.
+     *
+     * @param destination formats: `topicName:tags`
+     * @param messages    Collection of {@link org.springframework.messaging.Message}
+     * @param delayLevel  level for the delay message
+     * @return {@link SendResult}
+     */
+    public SendResult syncSend(String destination, Collection<Message<?>> messages, int delayLevel) {
+        return syncSend(destination, messages, producer.getSendMsgTimeout(), delayLevel);
+    }
+
+    /**
+     * Same to {@link #syncSend(String, Collection, long, int)} with send timeout specified in addition.
+     *
+     * @param destination formats: `topicName:tags`
+     * @param messages    Collection of {@link org.springframework.messaging.Message}
+     * @param timeout     send timeout with millis
+     * @return {@link SendResult}
+     */
+    public SendResult syncSend(String destination, Collection<Message<?>> messages, long timeout) {
+        return syncSend(destination, messages, timeout, 0);
+    }
+
+    /**
+     * Same to {@link #syncSend(String, Collection, long, int)}.
+     *
+     * @param destination formats: `topicName:tags`
+     * @param messages    Collection of {@link org.springframework.messaging.Message}
+     * @return {@link SendResult}
+     */
+    public SendResult syncSend(String destination, Collection<Message<?>> messages) {
+        return syncSend(destination, messages, producer.getSendMsgTimeout(), 0);
     }
 
     /**
@@ -199,6 +238,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
     public SendResult syncSend(String destination, Object payload) {
         return syncSend(destination, payload, producer.getSendMsgTimeout(), 0);
     }
+
     /**
      * Same to {@link #syncSend(String, Message)}.
      *
@@ -210,6 +250,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
     public SendResult syncSend(String destination, Object payload, int delayLevel) {
         return syncSend(destination, payload, producer.getSendMsgTimeout(), delayLevel);
     }
+
     /**
      * Same to {@link #syncSend(String, Object)} with send timeout specified in addition.
      *
@@ -417,6 +458,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
     public void asyncSend(String destination, Object payload, SendCallback sendCallback, int delayLevel) {
         asyncSend(destination, payload, sendCallback, producer.getSendMsgTimeout(), delayLevel);
     }
+
     /**
      * Same to {@link #asyncSend(String, Message, SendCallback)}.
      *
@@ -502,7 +544,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      *
      * @param destination formats: `topicName:tags`
      * @param message     {@link org.springframework.messaging.Message}
-     * @param delayLevel   level for the delay message
+     * @param delayLevel  level for the delay message
      */
     public void sendOneWay(String destination, Message<?> message, int delayLevel) {
         if (Objects.isNull(message) || Objects.isNull(message.getPayload())) {
@@ -522,6 +564,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
             throw new MessagingException(e.getMessage(), e);
         }
     }
+
     /**
      * Same to {@link #sendOneWay(String, Message)}
      *
@@ -537,12 +580,13 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      *
      * @param destination formats: `topicName:tags`
      * @param payload     the Object to use as payload
-     * @param delayLevel   level for the delay message
+     * @param delayLevel  level for the delay message
      */
     public void sendOneWay(String destination, Object payload, int delayLevel) {
         Message<?> message = this.doConvert(payload, null, null);
         sendOneWay(destination, message, delayLevel);
     }
+
     /**
      * Same to {@link #sendOneWay(String, Message)}
      *
