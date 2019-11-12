@@ -95,7 +95,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @return {@link SendResult}
      */
     public SendResult syncSend(String destination, Message<?> message) {
-        return syncSend(destination, message, producer.getSendMsgTimeout());
+        return syncSend(destination, message, producer.getSendMsgTimeout(), 0);
     }
 
     /**
@@ -399,7 +399,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @param sendCallback {@link SendCallback}
      */
     public void asyncSend(String destination, Message<?> message, SendCallback sendCallback) {
-        asyncSend(destination, message, sendCallback, producer.getSendMsgTimeout());
+        asyncSend(destination, message, sendCallback, producer.getSendMsgTimeout(), 0);
     }
 
     /**
@@ -467,7 +467,7 @@ public class RocketMQTemplate extends AbstractMessageSendingTemplate<String> imp
      * @param sendCallback {@link SendCallback}
      */
     public void asyncSend(String destination, Object payload, SendCallback sendCallback) {
-        asyncSend(destination, payload, sendCallback, producer.getSendMsgTimeout());
+        asyncSend(destination, payload, sendCallback, producer.getSendMsgTimeout(), 0);
     }
 
     /**
